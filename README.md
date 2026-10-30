@@ -2,11 +2,33 @@
 
 **Live demo: [https://turnover-map.pages.dev](https://turnover-map.pages.dev)**
 
+**Demo video (2 min): [https://youtu.be/8P1POpOLhLE](https://youtu.be/8P1POpOLhLE)**
+
 Pressing and turnover analytics for football coaching staff. Pick a team and see where on the pitch it wins the ball back, which of those regains lead to a shot within ten seconds, and where losing the ball hurts most.
 
 Built for the AQX Sports Analytics Data Bowl 4.0 on [StatsBomb Open Data](https://github.com/statsbomb/open-data): Premier League 2015/16, all 380 matches, 26,715 open-play turnovers.
 
 ![Overview, light mode](docs/screenshots/overview-light.jpg)
+
+## Demo video
+
+[![Watch the Turnover Map demo on YouTube](demo/youtube-thumbnail.jpg)](https://youtu.be/8P1POpOLhLE)
+
+A two-minute narrated walkthrough: [https://youtu.be/8P1POpOLhLE](https://youtu.be/8P1POpOLhLE). Captions: [demo/turnover-map-demo.srt](demo/turnover-map-demo.srt).
+
+| Time | Section |
+|---|---|
+| 0:00 | The problem |
+| 0:10 | Picking a team |
+| 0:22 | Coach's notes |
+| 0:37 | The pitch maps |
+| 0:49 | Zone detail |
+| 0:58 | Compared with the league |
+| 1:06 | Regain-to-shot chains |
+| 1:13 | Does the score explain it? |
+| 1:30 | Ball-winners and league context |
+| 1:40 | Clip list for video review |
+| 1:49 | Data and method |
 
 ## The problem
 
@@ -54,6 +76,17 @@ Turnover Map colours every zone by **what a turnover there was worth** (xG creat
 - Man City 1–3 Leicester (6 Feb 2016) parses to the correct scorers and minutes. None of the goals is counted as a regain goal, which is right: they came from set pieces and a sustained attack.
 - Leicester's top regain-to-goal chains include Vardy's stoppage-time goal at Sunderland (10 Apr 2016), his winner against Crystal Palace (24 Oct 2015) and his late equaliser at Southampton (17 Oct 2015). All are real counter-attacking goals.
 - N'Golo Kanté is Leicester's top ball-winner (179 open-play regains), and Leicester lead the league in xG from regains.
+
+## Gallery
+
+| | |
+|---|---|
+| ![Overview](demo/gallery/1-overview.jpg) | ![Heatmaps with zone detail](demo/gallery/2-heatmaps.jpg) |
+| Team overview and headline numbers | Heatmaps of turnovers won and conceded, with zone detail |
+| ![Chains and league comparison, dark mode](demo/gallery/3-chains-vs-league-dark.jpg) | ![Coach's notes](demo/gallery/4-notes.jpg) |
+| League comparison with regain-to-shot chains (dark mode) | Plain-English coach's notes |
+| ![Ball-winners and league scatter, dark mode](demo/gallery/5-context-dark.jpg) | ![Clip list](demo/gallery/6-clip-list.jpg) |
+| Ball-winners and league pressing style (dark mode) | Clip list for video review |
 
 ![Maps, dark mode](docs/screenshots/maps-dark.jpg)
 
