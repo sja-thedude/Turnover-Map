@@ -57,6 +57,7 @@ test('deep link loads that team, unknown team falls back', async ({ page }) => {
 })
 
 test('every team renders 24 zones per map and coach notes', async ({ page }) => {
+  test.setTimeout(90_000) // walks all 20 teams; slower over the network against the live site
   await open(page)
   const teams = await page.locator('.picker option').allTextContents()
   expect(teams).toHaveLength(20)

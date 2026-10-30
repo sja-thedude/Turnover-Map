@@ -1,0 +1,87 @@
+1
+00:00:00,000 --> 00:00:05,089
+Every coach talks about pressing. But ask which parts of your press actually create
+
+2
+00:00:05,089 --> 00:00:10,179
+chances, and most staff can't really tell you. That's the question Turnover Map answers.
+
+3
+00:00:10,629 --> 00:00:15,853
+Pick a team. This is Leicester, in their title-winning season. About thirty-five open-play regains
+
+4
+00:00:15,853 --> 00:00:21,449
+a match, and more expected goals from those regains than anyone else in the league.
+
+5
+00:00:21,899 --> 00:00:29,150
+First, the coach's notes, in plain English. Where winning the ball pays off, where it tends to go nowhere, and where losing
+
+6
+00:00:29,150 --> 00:00:36,729
+it hurts the most. And every note only uses zones with at least thirty turnovers, so nothing's built on a handful of moments.
+
+7
+00:00:37,179 --> 00:00:42,782
+Here's the heart of it. Each zone is coloured by what a regain there was actually worth, not by
+
+8
+00:00:42,782 --> 00:00:48,679
+how many there were. The hatched zones just don't have enough data yet, and we'd rather say that than guess.
+
+9
+00:00:49,129 --> 00:00:53,394
+Tap any zone for the detail. Right-centre, just past halfway: fifty
+
+10
+00:00:53,394 --> 00:00:57,659
+regains, and one in five became a shot inside ten seconds.
+
+11
+00:00:58,109 --> 00:01:01,929
+Switch to the league comparison, and you can see where this team gets
+
+12
+00:01:01,929 --> 00:01:05,749
+more than an average side would, from the very same patch of grass.
+
+13
+00:01:06,199 --> 00:01:09,604
+Turn on the chains, and every regain that led to a shot
+
+14
+00:01:09,604 --> 00:01:13,009
+is drawn on the pitch. The orange ones ended in a goal.
+
+15
+00:01:13,459 --> 00:01:21,392
+Now, an honest check. Leicester's regains were worth far more when they were already winning, because teams chasing the game leave space behind
+
+16
+00:01:21,392 --> 00:01:29,669
+them. So part of this pattern is the scoreline, not only the press. We treat it as a correlation, never as cause and effect.
+
+17
+00:01:30,119 --> 00:01:35,209
+Kanté wins the ball more than anyone in the squad. And across the league, Leicester sit well
+
+18
+00:01:35,209 --> 00:01:40,299
+above the pack on value per regain. You can tap any dot to jump to that team.
+
+19
+00:01:40,749 --> 00:01:44,712
+For the video analyst, every one of those chains is listed with the
+
+20
+00:01:44,712 --> 00:01:48,979
+match and the minute, best chances first, and it exports straight to a spreadsheet.
+
+21
+00:01:49,429 --> 00:01:54,860
+It's all precomputed from StatsBomb open data, so it loads instantly, works on a phone, and
+
+22
+00:01:54,860 --> 00:02:00,629
+the full table is right there for anyone who wants to check the work. That's Turnover Map.

@@ -12,3 +12,4 @@ __pycache__/
 test-results/
 playwright-report/
 .pytest_cache/
+demo/*.mp4
