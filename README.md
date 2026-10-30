@@ -97,6 +97,16 @@ pip install -r analysis/requirements.txt
 python3 analysis/build.py          # writes web/public/results.json (~20 s)
 ```
 
+## Testing
+
+```bash
+python3 -m pytest analysis     # 36 tests: regain rules, 10s window, xG maths, game state, results.json invariants
+cd web && npm run test:e2e      # 39 Playwright tests in Chrome, desktop and 390px phone
+BASE_URL=https://turnover-map.pages.dev npm run test:e2e   # same suite against the live site
+```
+
+The Python suite checks each rule on synthetic event sequences (lookback for the winning tackle, shots inside and outside the window, penalties and set pieces excluded, rebounds combined as one chance) and checks the output: every turnover is counted once per side, the conceded maps mirror the won maps, and no generated note cites a low-sample zone. The browser suite covers every team, both colour modes, chains, zone detail, keyboard use, theme persistence, table sorting, CSV export, sharing, print layout, the loading and error states, phone layout (no horizontal scroll, 44px tap targets) and an axe accessibility scan in light and dark mode.
+
 ## Deploy
 
 The site is static and deployed to Cloudflare Pages:
