@@ -236,7 +236,7 @@ def vs_league(z, unit="zone"):
     elif ratio <= 0.8:
         words = f"{ratio:.1f}x the league average for that {unit}, so below par"
     else:
-        words = "about the league average for that {unit}"
+        words = f"about the league average for that {unit}"
     if z["clear_gap"]:
         return words + ", a gap larger than chance would explain"
     return words + (", though within normal variation" if abs(ratio - 1) >= 0.2 else "")
