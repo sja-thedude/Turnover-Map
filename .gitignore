@@ -1,6 +1,6 @@
 # StatsBomb raw data (clone locally, see README)
 data/statsbomb/
-data/event_paths.txt
+data/*.txt
 
 node_modules/
 web/dist/
