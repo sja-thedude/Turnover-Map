@@ -12,6 +12,7 @@
   --line: #e2ded5;
   --accent: #c43d00;
   --accent-soft: #fbe3d7;
+  --accent-ink: #9a3000;
   --on-accent: #ffffff;
   --pitch: #e8e5dc;
   --pitch-line: rgba(23, 24, 26, 0.5);
@@ -47,7 +48,7 @@
   --hatch: #b5afa2;
 
   --good: #2f7d4f;
-  --warn: #a86400;
+  --warn: #855000;
   --warn-soft: #f6e8cf;
 
   color-scheme: light;
@@ -63,6 +64,7 @@
   --line: #2a302e;
   --accent: #f47f46;
   --accent-soft: #3a2318;
+  --accent-ink: #f8956a;
   --on-accent: #1a0c05;
   --pitch: #1b201e;
   --pitch-line: rgba(236, 235, 229, 0.42);
@@ -1032,7 +1034,7 @@ main {
 .badge.ok {
   background: var(--accent-soft);
   border-color: transparent;
-  color: var(--accent);
+  color: var(--accent-ink);
 }
 
 .detail dl {
