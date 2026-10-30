@@ -1,0 +1,11 @@
+# StatsBomb raw data (clone locally, see README)
+data/statsbomb/
+data/event_paths.txt
+
+node_modules/
+web/dist/
+.wrangler/
+__pycache__/
+.venv/
+.env
+.DS_Store
