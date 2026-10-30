@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Turnover Map · Pressing analytics for coaches</title>
+    <meta
+      name="description"
+      content="Where does your team win the ball back, and which regains lead to a shot? Zone-by-zone pressing and turnover analysis of the 2015/16 Premier League, built on StatsBomb Open Data."
+    />
+    <meta name="theme-color" content="#f5f3ee" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://turnover-map.pages.dev/" />
+    <meta property="og:title" content="Turnover Map · Pressing analytics for coaches" />
+    <meta
+      property="og:description"
+      content="Which zones of your press create chances, and which are effort for nothing? Every Premier League 2015/16 regain, mapped and scored."
+    />
+    <meta property="og:image" content="https://turnover-map.pages.dev/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" href="/results.json" as="fetch" crossorigin />
+    <script>
+      try {
+        var t = localStorage.getItem('theme')
+        if (t !== 'light' && t !== 'dark') t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+        document.documentElement.dataset.theme = t
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <noscript>Turnover Map needs JavaScript to draw the pitch maps.</noscript>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
