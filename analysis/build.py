@@ -74,6 +74,11 @@ def match_turnovers(events, match_id):
     for e in events:
         e["_t"] = seconds(e["timestamp"])
 
+    # Goals in event order, so we know the score at the moment of each regain.
+    goals = [(e["index"], e["team"]["name"]) for e in events
+             if (e["type"]["name"] == "Shot" and e["shot"]["outcome"]["name"] == "Goal")
+             or e["type"]["name"] == "Own Goal For"]
+
     by_poss = {}
     for e in events:
         by_poss.setdefault(e["possession"], []).append(e)
@@ -112,7 +117,12 @@ def match_turnovers(events, match_id):
         # Probability at least one of the shots scores, so rebounds are not double counted.
         xg = 1 - math.prod(1 - s["shot"]["statsbomb_xg"] for s in shots) if shots else 0.0
 
+        ours = sum(1 for i, t in goals if i < regain["index"] and t == team)
+        theirs = sum(1 for i, t in goals if i < regain["index"] and t != team)
+        state = "Leading" if ours > theirs else "Trailing" if ours < theirs else "Level"
+
         x, y = regain["location"][:2]
+        sx, sy = shots[0]["location"][:2] if shots else (None, None)
         rows.append({
             "match_id": match_id, "period": period, "minute": regain["minute"],
             "second": regain["second"], "team": team, "opponent": lost_by,
@@ -120,17 +130,32 @@ def match_turnovers(events, match_id):
             "x": x, "y": y, "shot": bool(shots), "xg": xg,
             "goal": any(s["shot"]["outcome"]["name"] == "Goal" for s in shots),
             "shooter": shots[0]["player"]["name"] if shots else None,
+            "player_id": regain.get("player", {}).get("id"),
+            "shooter_id": shots[0]["player"]["id"] if shots else None,
+            "sx": sx, "sy": sy, "state": state,
         })
     return rows
 
 
 def load(root):
     matches = json.loads((root / f"data/matches/{COMPETITION_ID}/{SEASON_ID}.json").read_text())
-    rows = []
+    rows, names = [], {}
     for m in matches:
         events = json.loads((root / f"data/events/{m['match_id']}.json").read_text())
-        rows += match_turnovers(events, m["match_id"])
+        match_rows = match_turnovers(events, m["match_id"])
+        for r in match_rows:
+            r["date"] = m["match_date"]
+            r["home"] = r["team"] == m["home_team"]["home_team_name"]
+        rows += match_rows
+        lineups = root / f"data/lineups/{m['match_id']}.json"
+        if lineups.exists():
+            for side in json.loads(lineups.read_text()):
+                for pl in side["lineup"]:
+                    names[pl["player_id"]] = pl.get("player_nickname") or pl["player_name"]
     df = pd.DataFrame(rows)
+    # Use the name people know (e.g. "Cesc Fàbregas", not the full legal name).
+    df["player"] = [names.get(i, n) for i, n in zip(df["player_id"], df["player"])]
+    df["shooter"] = [names.get(i, n) if n else None for i, n in zip(df["shooter_id"], df["shooter"])]
     df[["col", "row"]] = df.apply(lambda r: zone_of(r.x, r.y), axis=1, result_type="expand")
     # The same regain seen from the team that lost the ball: flip into their frame.
     df["col_lost"] = COLS - 1 - df["col"]
@@ -280,6 +305,65 @@ def summarise(team, won, conceded, thirds, n_matches):
     return lines
 
 
+STATES = ["Leading", "Level", "Trailing"]
+FLIP_STATE = {"Leading": "Trailing", "Level": "Level", "Trailing": "Leading"}
+
+
+def chains(w, c):
+    """Every regain that became a shot, in the team's frame, for the map and the clip list."""
+    out = []
+    for side, g, flip in (("won", w, False), ("conceded", c, True)):
+        for r in g[g.shot].sort_values(["date", "period", "minute", "second"]).itertuples():
+            x, y, sx, sy = r.x, r.y, r.sx, r.sy
+            if flip:
+                x, y, sx, sy = PITCH_X - x, PITCH_Y - y, PITCH_X - sx, PITCH_Y - sy
+            out.append({
+                "side": side, "date": r.date, "opp": r.opponent if side == "won" else r.team,
+                "home": bool(r.home) if side == "won" else not r.home,
+                "period": int(r.period), "min": int(r.minute), "sec": int(r.second),
+                "player": r.player, "shooter": r.shooter, "kind": r.kind,
+                "x": round(x, 1), "y": round(y, 1), "sx": round(sx, 1), "sy": round(sy, 1),
+                "xg": round(float(r.xg), 3), "goal": bool(r.goal),
+            })
+    return out
+
+
+def players(w, top=8):
+    """Who wins the ball for this team, and whose regains turn into chances."""
+    g = w.groupby("player").agg(n=("x", "size"), high=("x", lambda v: int((v >= PITCH_X / 2).sum())),
+                                shots=("shot", "sum"), xg=("xg", "sum"))
+    g = g.sort_values("n", ascending=False).head(top)
+    return [{"name": n, "n": int(r.n), "high": int(r.high), "shots": int(r.shots), "xg": round(float(r.xg), 2)}
+            for n, r in g.iterrows()]
+
+
+def game_states(g, state_col, league_by_state):
+    out = []
+    for st in STATES:
+        s = zone_stats(g[g[state_col] == st])
+        lg = league_by_state[st]
+        s.update(state=st, league_xg_per=lg["xg_per"], low_n=s["n"] < MIN_N)
+        s["clear_gap"] = bool(s["se"]) and s["n"] >= MIN_N and abs(s["xg_per"] - lg["xg_per"]) > 1.96 * s["se"]
+        out.append(s)
+    return out
+
+
+def state_note(states):
+    """Game state is the biggest confounder: teams counter more when leading. Show it."""
+    ok = [st for st in states if not st["low_n"]]
+    if len(ok) < 2:
+        return None
+    best = max(ok, key=lambda st: st["xg_per"])
+    worst = min(ok, key=lambda st: st["xg_per"])
+    if best is worst or not worst["xg_per"]:
+        return None
+    return {"kind": "good", "title": "Score changes the picture",
+            "text": f"Your regains were worth most when <b>{best['state'].lower()}</b>: {best['xg_per']:.3f} xG each "
+                    f"over {best['n']} regains, against {worst['xg_per']:.3f} when {worst['state'].lower()}. "
+                    f"Versus the league in the same game state, that is {vs_league(best, 'game state')}. "
+                    f"So part of any zone pattern may reflect the score, not the press itself."}
+
+
 def build(root, out_path):
     matches, df = load(root)
     n_total = len(matches)
@@ -288,6 +372,10 @@ def build(root, out_path):
     for col in range(COLS):
         for row in range(ROWS):
             league_won.append(zone_stats(df[(df.col == col) & (df.row == row)]))
+
+    league_state = {st: zone_stats(df[df.state == st]) for st in STATES}
+    # A team trailing when it loses the ball means the regaining side is leading.
+    league_state_conc = {st: zone_stats(df[df.state == FLIP_STATE[st]]) for st in STATES}
 
     team_matches = {}
     for m in matches:
@@ -304,12 +392,27 @@ def build(root, out_path):
         league_conceded = [league_won[(COLS - 1 - col) * ROWS + (ROWS - 1 - row)]
                            for col in range(COLS) for row in range(ROWS)]
         conceded = zone_table(c, "col_lost", "row_lost", league_conceded)
+        c = c.assign(state_team=c["state"].map(FLIP_STATE))
+        style = {
+            "high_per_match": round(float((w.x >= PITCH_X / 2).sum()) / n_m, 2),
+            "high_share": round(float((w.x >= PITCH_X / 2).mean()), 4),
+            "xg_per": round(float(w.xg.mean()), 4),
+            "conceded_xg_per": round(float(c.xg.mean()), 4),
+        }
         teams.append({
-            "name": team, "matches": n_m,
+            "name": team, "matches": n_m, "style": style,
+            "chains": chains(w, c), "players": players(w),
+            "states": {"won": game_states(w, "state", league_state),
+                       "conceded": game_states(c, "state_team", league_state_conc)},
             "won": {"totals": totals(w, n_m, "col", df), "zones": won},
             "conceded": {"totals": totals(c, n_m, "col_lost", df), "zones": conceded},
             "summary": summarise(team, won, conceded, totals(w, n_m, "col", df)["thirds"], n_m),
         })
+
+    for t in teams:
+        note = state_note(t["states"]["won"])
+        if note:
+            t["summary"].insert(len(t["summary"]) - 1, note)
 
     # League ranks for headline numbers (1 = best).
     for key, side, rev in [("xg_won", "won", True), ("xg_conceded", "conceded", False)]:
